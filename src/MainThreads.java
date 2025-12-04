@@ -79,13 +79,12 @@ public class MainThreads {
 
     public static void simpleThreads() {
         System.out.println("Запуск простой многопоточной версии:");
-
         Task task = new Task(100);
 
         Thread generatorThread = new Thread(new SimpleGenerator(task));
         Thread integratorThread = new Thread(new SimpleIntegrator(task));
 
-        System.out.println("Установка приоритетов: генератор - min, интегратор - max");
+        System.out.println("Установка приоритетов: генератор - MIN, интегратор - MAX");
         generatorThread.setPriority(Thread.MIN_PRIORITY);
         integratorThread.setPriority(Thread.MAX_PRIORITY);
 
@@ -93,22 +92,21 @@ public class MainThreads {
         integratorThread.start();
 
         try {
-            long timeout = 3000;
-            long startTime = System.currentTimeMillis();
-
-            while ((generatorThread.isAlive() || integratorThread.isAlive()) &&
-                    (System.currentTimeMillis() - startTime) < timeout) {
-                Thread.sleep(100);
-            }
+            generatorThread.join(5000);
+            integratorThread.join(1000);
 
             if (generatorThread.isAlive() || integratorThread.isAlive()) {
-                System.out.println("\nТаймаут: Потоки зависли, принудительное прерывание..........");
+                System.out.println("\nТАЙМАУТ: Потоки зависли, принудительное прерывание...");
                 generatorThread.interrupt();
                 integratorThread.interrupt();
 
-                generatorThread.join(500);
-                integratorThread.join(500);
+                Thread.sleep(500);
             }
+
+            System.out.println("Потоки завершены: генератор - " +
+                    (generatorThread.isAlive() ? "Не завершен" : "завершен") +
+                    ", интегратор - " +
+                    (integratorThread.isAlive() ? "Не завершен" : "завершен"));
 
         } catch (InterruptedException e) {
             System.out.println("Основной поток прерван");

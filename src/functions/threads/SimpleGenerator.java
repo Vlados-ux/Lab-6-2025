@@ -5,7 +5,6 @@ import functions.basic.Log;
 
 public class SimpleGenerator implements Runnable {
     private Task task;
-    private boolean running = true;
 
     public SimpleGenerator(Task task) {
         this.task = task;
@@ -14,7 +13,8 @@ public class SimpleGenerator implements Runnable {
     @Override
     public void run() {
         try {
-            for (int i = 0; i < task.getTasksCount() && running; i++) {
+            for (int i = 0; i < task.getTasksCount(); i++) {
+
                 synchronized (task) {
                     double base = 1 + Math.random() * 9;
                     Log logFunc = new Log(base);
@@ -30,28 +30,29 @@ public class SimpleGenerator implements Runnable {
 
                     System.out.printf("Source %.2f %.2f %.2f%n", left, right, step);
 
+                    task.setTaskReady(true);
+
                     task.notify();
 
                     if (i < task.getTasksCount() - 1) {
-                        task.wait();
+                        task.wait(100);
                     }
                 }
 
-                Thread.sleep(1);
+                Thread.sleep(10);
             }
 
             synchronized (task) {
-                running = false;
+                task.setTaskReady(false);
+                task.setTasksCount(-1);
                 task.notify();
             }
 
         } catch (InterruptedException e) {
-            System.out.println("Генератор прерван");
+            System.out.println("SimpleGenerator: прерван");
             Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            System.out.println("SimpleGenerator ошибка: " + e.getMessage());
         }
-    }
-
-    public void stop() {
-        running = false;
     }
 }

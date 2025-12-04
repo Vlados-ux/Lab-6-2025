@@ -9,6 +9,7 @@ public class Task {
     private double right;
     private double step;
     private int tasksCount;
+    private boolean taskReady = false;
 
     public Task(int tasksCount) {
         this.tasksCount = tasksCount;
@@ -52,5 +53,13 @@ public class Task {
 
     public void setStep(double step) {
         this.step = step;
+    }
+
+    public boolean isTaskReady() {
+        return taskReady;
+    }
+
+    public void setTaskReady(boolean ready) {
+        this.taskReady = ready;
     }
 }
